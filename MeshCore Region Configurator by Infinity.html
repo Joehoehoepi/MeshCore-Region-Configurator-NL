@@ -2863,8 +2863,8 @@ function generateConfig(cities) {
         const matchingHub = hubData.broaderRegion ? hubData.broaderRegion.toLowerCase() : null;
 
         // --- ARRAYS VOOR DE VOLGORDE ---
-        let puts = [`region put nl`];
-        let allows = [`region allowf nl`];
+        let puts = [`region put eu`, `region put nl`];
+		let allows = [`region allowf eu`, `region allowf nl`];
 
         // 2. Provincies (Altijd eerst)
         let provincesInRadius = new Set();
