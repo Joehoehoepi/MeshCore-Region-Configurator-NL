@@ -20,7 +20,7 @@ If you set a coverage radius of 10 kilometers around Elburg, your signal crosses
 🚀 **Key Features**
 
 * **Complete Dutch Database:** Includes all **342 municipalities** with accurate coordinates and provincial coding.
-* **Dynamic Radius Selection:** Adjust your reach (5km to 40km) to match your antenna's performance.
+* **Dynamic Radius Selection:** Adjust your reach (5km to 25km) to match your antenna's performance.
 * **Smart Cross-Border Detection:** Automatically identifies and maps all municipalities within your reach, regardless of provincial borders.
 * **Full Command Hierarchy:** Generates the correct `region put` and `region allowf` commands for:
 1. **Country** (NL)
