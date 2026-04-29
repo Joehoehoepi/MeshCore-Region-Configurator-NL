@@ -205,12 +205,12 @@ button:hover { background: var(--neon); color: #000; }
 
     <div class="control-group slider-box">
         <label>DETECTION RADIUS</label>
-        <span id="radius-label" class="radius-val">25 KM</span>
-        <input id="radius-slider" type="range" min="5" max="25" value="25">
+        <span id="radius-label" class="radius-val">10 KM</span>
+        <input id="radius-slider" type="range" min="5" max="25" value="10">
     </div>
 	<div class="mode-selector" style="margin-bottom: 10px; display: flex; gap: 10px;">
     <button id="btn-simple" onclick="setMode('simple')" style="flex: 1; font-size: 10px; padding: 5px;">BASIS (PROVINCIE)</button>
-    <button id="btn-extended" onclick="setMode('extended')" style="flex: 1; font-size: 10px; padding: 5px;">UITGEBREID (GEMEENTE)</button>
+    <button id="btn-extended" onclick="setMode('extended')" style="flex: 1; font-size: 10px; padding: 5px; display: none;">UITGEBREID (GEMEENTE)</button>
 	</div>
     <div id="output">SYSTEM READY...</div>
     
@@ -2863,8 +2863,8 @@ function generateConfig(cities) {
         const matchingHub = hubData.broaderRegion ? hubData.broaderRegion.toLowerCase() : null;
 
         // --- ARRAYS VOOR DE VOLGORDE ---
-        let puts = [`region put eu`, `region put nl`];
-		let allows = [`region allowf eu`, `region allowf nl`];
+        let puts = [`region put eu`, `region put nl`, `region put bx`, `region put europe`];
+		let allows = [`region put eu`, `region put nl`, `region put bx`, `region put europe`];
 
         // 2. Provincies (Altijd eerst)
         let provincesInRadius = new Set();
@@ -2877,11 +2877,31 @@ function generateConfig(cities) {
             allows.push(`region allowf nl-${p}`);
         });
 
-        // 3. Region Hub (bijv. nl-zwo)
-        if (matchingHub) {
-            puts.push(`region put ${matchingHub} nl`);
-            allows.push(`region allowf ${matchingHub}`);
+        // 3. Maximaal 4 dichtstbijzijnde Region Hubs
+		let closestHubs = [];
+
+		// Loop door de GESORTEERDE steden (van dichtbij naar ver)
+		for (let c of sortedCities) {
+		if (c.broaderRegion) {
+        let hub = c.broaderRegion.toLowerCase();
+        
+        // Voeg de hub toe als we hem nog niet hebben
+        if (!closestHubs.includes(hub)) {
+            closestHubs.push(hub);
         }
+		}
+    
+		// Zodra we 4 unieke hubs hebben gevonden, stoppen we met zoeken
+		if (closestHubs.length >= 4) {
+        break;
+		}
+		}
+
+		// Voeg de gevonden hubs toe aan de configuratie
+		closestHubs.forEach(hub => {
+		puts.push(`region put ${hub} nl`);
+		allows.push(`region allowf ${hub}`);
+		});
 
         // 4. Uitgebreide modus: Extra dorpen (behalve de Hub Stad zelf)
         if (typeof currentMode !== 'undefined' && currentMode === 'extended') {
