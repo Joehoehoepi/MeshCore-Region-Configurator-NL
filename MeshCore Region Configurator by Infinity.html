@@ -2864,7 +2864,7 @@ function generateConfig(cities) {
 
         // --- ARRAYS VOOR DE VOLGORDE ---
         let puts = [`region put eu`, `region put nl`, `region put bx`, `region put europe`];
-		let allows = [`region allowf eu`, `region allowf nl`, `region allowf bx`, `region allowf europe`];
+        let allows = [`region allowf eu`, `region allowf nl`, `region allowf bx`, `region allowf europe`];
 
         // 2. Provincies (Altijd eerst)
         let provincesInRadius = new Set();
@@ -2877,11 +2877,10 @@ function generateConfig(cities) {
             allows.push(`region allowf nl-${p}`);
         });
 
-        // 3. Region Hubs (Alleen hubs die FYSIEK binnen de straal liggen)
+        // 3. Region Hubs (isHub: true)
         let closestHubs = [];
-        let radiusLimit = _slider.value * 1000; // Straal in meters
+        let radiusLimit = _slider.value * 1000;
 
-        // We maken een tijdelijk lijstje van alle echte hubs (isHub: true) die dichtbij genoeg zijn
         let foundHubs = [];
         DUTCH_CITIES.forEach(c => {
             if (c.isHub === true && c.broaderRegion) {
@@ -2895,10 +2894,8 @@ function generateConfig(cities) {
             }
         });
 
-        // Sorteer de gevonden hubs op afstand (dichtstbijzijnde eerst)
         foundHubs.sort((a, b) => a.distance - b.distance);
 
-        // Pak de unieke top 4 en voeg ze toe
         for (let h of foundHubs) {
             if (!closestHubs.includes(h.region)) {
                 closestHubs.push(h.region);
@@ -2911,17 +2908,16 @@ function generateConfig(cities) {
             allows.push(`region allowf ${hub}`);
         });
 
-        // 4. Uitgebreide modus: Extra dorpen (behalve de Hub Stad zelf)
+        // 4. Uitgebreide modus: Extra dorpen
         if (typeof currentMode !== 'undefined' && currentMode === 'extended') {
             let regionCount = puts.length;
             sortedCities.forEach(city => {
                 const cLocode = (city.placeLocode || "").toLowerCase();
-                if (!cLocode || cLocode === 'unk') return; // Filter "unk"
+                if (!cLocode || cLocode === 'unk') return;
                 
                 const cProv = getProv(city);
                 const cRegion = `nl-${cProv}-${cLocode}`;
                 
-                // Alleen toevoegen als het niet de Hub Stad is
                 if (cRegion !== hubCityRegion && regionCount < 31) {
                     puts.push(`region put ${clamp(cRegion)} nl-${cProv}`);
                     allows.push(`region allowf ${clamp(cRegion)}`);
@@ -2930,9 +2926,8 @@ function generateConfig(cities) {
             });
         }
 
-        // 5. De Hub Stad zelf (als laatste put)
-        const hubParent = matchingHub ? matchingHub : `nl-${hubProv}`;
-        puts.push(`region put ${hubCityRegion} ${hubParent}`);
+        // 5. De Hub Stad zelf (Limmen) - NU GEFORCEERD ONDER PROVINCIE
+        puts.push(`region put ${hubCityRegion} nl-${hubProv}`);
         allows.push(`region allowf ${hubCityRegion}`);
 
         // 6. Samenvoegen tot finale tekst
