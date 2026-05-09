@@ -1037,7 +1037,7 @@ button:hover { background: var(--neon); color: #000; }
   { name: "Wapse", placeLocode: "", province: "Drenthe", province2: "Friesland", province3: "Overijssel", lat: 52.8593, lon: 6.267, radiusM: 2556, municipalityName: "Westerveld", municipalityLocode: "WTV", placeCode: "", municipalityCode: "nl-dr-wtv", broaderName: "Assen", broaderRegion: "nl-ass", broaderName2: "Heerenveen", broaderRegion2: "nl-hrv", broaderName3: "", broaderRegion3: "", broaderName4: "", broaderRegion4: "", isHub: false },
   { name: "Wapserveen", placeLocode: "", province: "Drenthe", province2: "Overijssel", province3: "Friesland", lat: 52.8252, lon: 6.2159, radiusM: 2581, municipalityName: "Westerveld", municipalityLocode: "WTV", placeCode: "", municipalityCode: "nl-dr-wtv", broaderName: "Heerenveen", broaderRegion: "nl-hrv", broaderName2: "", broaderRegion2: "", broaderName3: "", broaderRegion3: "", broaderName4: "", broaderRegion4: "", isHub: false },
   { name: "Wateren", placeLocode: "", province: "Drenthe", province2: "Friesland", province3: "", lat: 52.9061, lon: 6.2889, radiusM: 1634, municipalityName: "Westerveld", municipalityLocode: "WTV", placeCode: "", municipalityCode: "nl-dr-wtv", broaderName: "Assen", broaderRegion: "nl-ass", broaderName2: "", broaderRegion2: "", broaderName3: "", broaderRegion3: "", broaderName4: "", broaderRegion4: "", isHub: false },
-  { name: "Weiteveen", placeLocode: "EMM", province: "Drenthe", province2: "", province3: "", lat: 52.6722, lon: 6.9911, radiusM: 2223, municipalityName: "Emmen", municipalityLocode: "EMM", placeCode: "", municipalityCode: "nl-dr-emm", broaderName: "Emmen", broaderRegion: "nl-emm", broaderName2: "", broaderRegion2: "", broaderName3: "", broaderRegion3: "", broaderName4: "", broaderRegion4: "", isHub: false },
+  { name: "Weiteveen", placeLocode: "", province: "Drenthe", province2: "", province3: "", lat: 52.6722, lon: 6.9911, radiusM: 2223, municipalityName: "Emmen", municipalityLocode: "EMM", placeCode: "", municipalityCode: "nl-dr-emm", broaderName: "Emmen", broaderRegion: "nl-emm", broaderName2: "", broaderRegion2: "", broaderName3: "", broaderRegion3: "", broaderName4: "", broaderRegion4: "", isHub: false },
   { name: "Westdorp", placeLocode: "", province: "Drenthe", province2: "", province3: "", lat: 52.9043, lon: 6.7667, radiusM: 1391, municipalityName: "Borger-Odoorn", municipalityLocode: "BOO", placeCode: "", municipalityCode: "nl-dr-boo", broaderName: "Emmen", broaderRegion: "nl-emm", broaderName2: "Stadskanaal", broaderRegion2: "nl-stk", broaderName3: "", broaderRegion3: "", broaderName4: "", broaderRegion4: "", isHub: false },
   { name: "Westerbork", placeLocode: "WBK", province: "Drenthe", province2: "", province3: "", lat: 52.8492, lon: 6.6103, radiusM: 2042, municipalityName: "Midden-Drenthe", municipalityLocode: "MDD", placeCode: "nl-dr-wbk", municipalityCode: "nl-dr-mdd", broaderName: "Assen", broaderRegion: "nl-ass", broaderName2: "", broaderRegion2: "", broaderName3: "", broaderRegion3: "", broaderName4: "", broaderRegion4: "", isHub: false },
   { name: "Westervelde", placeLocode: "", province: "Drenthe", province2: "Friesland", province3: "Groningen", lat: 53.0534, lon: 6.4438, radiusM: 1414, municipalityName: "Noordenveld", municipalityLocode: "NOV", placeCode: "", municipalityCode: "nl-dr-nov", broaderName: "Assen", broaderRegion: "nl-ass", broaderName2: "", broaderRegion2: "", broaderName3: "", broaderRegion3: "", broaderName4: "", broaderRegion4: "", isHub: false },
@@ -2858,7 +2858,8 @@ function generateConfig(cities) {
         };
 
         const hubProv = getProv(hubData);
-        const hubLocode = (hubData.placeLocode || "").toLowerCase();
+        // Fallback: gebruik municipalityLocode als placeLocode leeg is
+        const hubLocode = (hubData.placeLocode || hubData.municipalityLocode || "").toLowerCase();
         const hubCityRegion = `nl-${hubProv}-${hubLocode}`;
         const matchingHub = hubData.broaderRegion ? hubData.broaderRegion.toLowerCase() : null;
 
@@ -2912,7 +2913,8 @@ function generateConfig(cities) {
         if (typeof currentMode !== 'undefined' && currentMode === 'extended') {
             let regionCount = puts.length;
             sortedCities.forEach(city => {
-                const cLocode = (city.placeLocode || "").toLowerCase();
+                // Fallback ook hier toepassen voor extra dorpen in de lijst
+                const cLocode = (city.placeLocode || city.municipalityLocode || "").toLowerCase();
                 if (!cLocode || cLocode === 'unk') return;
                 
                 const cProv = getProv(city);
