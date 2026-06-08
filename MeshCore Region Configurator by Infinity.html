@@ -2787,6 +2787,25 @@ button:hover { background: var(--neon); color: #000; }
         if (cityObj) {
             _search.value = cityObj.name.toUpperCase();
             displayGoldmineInfo(cityObj);
+
+            // VOORWAARDE 3: Radius limiteren voor Regio West (max 10km, anders 25km)
+            const getProvCode = (c) => {
+                if (c.province && typeof PROV_CODES !== 'undefined' && PROV_CODES[c.province]) return PROV_CODES[c.province].toLowerCase();
+                if (c.provinceCode) return c.provinceCode.toLowerCase();
+                return "nl"; 
+            };
+            
+            const pCode = getProvCode(cityObj);
+            const isWestRegion = ['ut', 'nh', 'zh'].includes(pCode); // <- Hier is de spatie nu hersteld!
+
+            if (isWestRegion) {
+                _slider.max = 10; // Zet de fysieke grens van de slider op 10
+                if (parseInt(_slider.value) > 10) {
+                    _slider.value = 10; // Forceer de waarde omlaag als deze op bijv. 25 stond
+                }
+            } else {
+                _slider.max = 25; // Herstel naar de standaard 25 km voor de rest van NL
+            }
         }
         _results.style.display = 'none';
         map.flyTo(latlng, 10);
@@ -2864,8 +2883,32 @@ function generateConfig(cities) {
         const matchingHub = hubData.broaderRegion ? hubData.broaderRegion.toLowerCase() : null;
 
         // --- ARRAYS VOOR DE VOLGORDE ---
-        let puts = [`region put eu`, `region put nl`, `region put bx`, `region put europe`];
-        let allows = [`region allowf eu`, `region allowf nl`, `region allowf bx`, `region allowf europe`];
+        // 'bx' is hier nu uitgehaald, die voegen we hieronder voorwaardelijk toe
+        let puts = [`region put eu`, `region put nl`, `region put europe`];
+        let allows = [`region allowf eu`, `region allowf nl`, `region allowf europe`];
+
+        // VOORWAARDE 1: Regio BX (Benelux) alleen toevoegen bij Brabant (nb) of Luxemburg (lu)
+        if (hubProv === 'nb' || hubProv === 'lu') {
+            puts.push(`region put bx`);
+            allows.push(`region allowf bx`);
+        }
+
+        // VOORWAARDE 2: NUTS-regio's dynamisch toevoegen op basis van de Hub-provincie
+        if (['fr', 'gr', 'dr'].includes(hubProv)) {
+            puts.push(`region put nl-noord nl`);
+            allows.push(`region allowf nl-noord`);
+        } else if (['ov', 'ge', 'fl'].includes(hubProv)) {
+            puts.push(`region put nl-oost nl`);
+            allows.push(`region allowf nl-oost`);
+        } else if (['ut', 'nh', 'zh', 'ze'].includes(hubProv)) {
+            puts.push(`region put nl-west nl`);
+            allows.push(`region allowf nl-west`);
+        } else if (['nb', 'li'].includes(hubProv)) {
+            puts.push(`region put nl-zuid nl`);
+            allows.push(`region allowf nl-zuid`);
+        }
+
+        // 2. Provincies (Altijd eerst)
 
         // 2. Provincies (Altijd eerst)
         let provincesInRadius = new Set();
