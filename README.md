@@ -17,6 +17,9 @@ If you set a coverage radius of 10 kilometers around Elburg, your signal crosses
 
 **The Risk:** Without this configurator, a user might only configure their home province/region, causing the node to become "isolated" from peers that are physically nearby but across a provincial line. This tool ensures **100% cross-border connectivity** by automatically identifying every relevant municipality.
 
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/615c2bcd-fc88-423e-b9d8-fc0c25bcfaf3" />
+
+
 🚀 **Key Features**
 
 * **Complete Dutch Database:** Includes all **342 municipalities** with accurate coordinates and provincial coding.
